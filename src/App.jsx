@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { shouldWork, formatDate, generateWhatsAppText, exportData, importData } from './utils/helpers';
 import {
@@ -73,12 +73,10 @@ function App() {
   const [schedules, setSchedules] = useLocalStorage('schedules', {});
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [currentView, setCurrentView] = useState('schedule');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Modal states
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [showBackupModal, setShowBackupModal] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [editingCategory, setEditingCategory] = useState(null);
 
@@ -190,7 +188,8 @@ function App() {
       setEmployees(employees.map(e => e.id === editingEmployee.id ? { ...employeeForm, id: e.id } : e));
       showToast('Colaborador atualizado!');
     } else {
-      const newEmployee = { ...employeeForm, id: Date.now().toString() };
+      const newId = crypto.randomUUID();
+      const newEmployee = { ...employeeForm, id: newId };
       setEmployees([...employees, newEmployee]);
       showToast('Colaborador adicionado!');
     }
@@ -248,8 +247,9 @@ function App() {
       setCategories(categories.map(c => c.id === editingCategory.id ? { ...c, name: categoryForm.name } : c));
       showToast('Categoria atualizada!');
     } else {
+      const newId = crypto.randomUUID();
       const newCategory = {
-        id: Date.now().toString(),
+        id: newId,
         name: categoryForm.name,
         order: categories.length,
         fixed: false
@@ -345,7 +345,6 @@ function App() {
           setCategories(data.categories);
           setSchedules(data.schedules);
           showToast('Backup importado com sucesso!');
-          setShowBackupModal(false);
         } catch (error) {
           alert('Erro ao importar arquivo: ' + error.message);
         }
@@ -361,7 +360,6 @@ function App() {
         setCategories([{ id: 'folga', name: 'Folga', order: 999, fixed: true }]);
         setSchedules({});
         showToast('Dados limpos!');
-        setShowBackupModal(false);
       }
     }
   };

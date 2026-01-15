@@ -103,7 +103,7 @@ export function importData(jsonString) {
       categories: data.categories || [],
       schedules: data.schedules || {}
     };
-  } catch (error) {
+  } catch {
     throw new Error('Invalid JSON format');
   }
 }
